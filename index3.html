@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Music Player</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #121212;
+      color: #fff;
+    }
+    .player {
+      width: 320px;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .cover {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .controls button {
+      margin: 5px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .controls button:hover { background: #444; }
+    input[type="range"] {
+      width: 100%;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="player">
+    <img id="cover" class="cover" src="https://picsum.photos/seed/music/600/400" alt="cover">
+    <h3 id="title">No song loaded</h3>
+    <p id="artist">—</p>
+    <audio id="audio"></audio>
+    <input type="range" id="progress" value="0">
+    <div class="controls">
+      <button id="prev">⏮ Prev</button>
+      <button id="play">▶ Play</button>
+      <button id="next">⏭ Next</button>
+    </div>
+    <div>
+      Volume: <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8">
+    </div>
+  </div>
+
+  <script>
+  
+    const tracks = [
+      {
+        title: "Delo Sound",
+        artist: "White Records",
+        src: "piano-background-music-398277.mp3",
+        cover: "https://picsum.photos/200?random=1"
+       
+      },
+      {
+        title: "Dancing under stars",
+        artist: "White Records",
+        src: "dancing-under-the-stars-cinematic-background-music-for-video-short-394179.mp3",
+        cover: "https://picsum.photos/200?random=2"
+      },
+      {
+        title: "alone in the dark",
+        artist: "White Records",
+        src: "alone-in-the-dark-cinematic-background-music-for-vlog-video-short-394176.mp3",
+        cover: "https://picsum.photos/200?random=3"
+      }
+    ];
+
+    let index = 0;
+    const audio = document.getElementById("audio"),
+          titleEl = document.getElementById("title"),
+          artistEl = document.getElementById("artist"),
+          coverEl = document.getElementById("cover"),
+          playBtn = document.getElementById("play"),
+          prevBtn = document.getElementById("prev"),
+          nextBtn = document.getElementById("next"),
+          progress = document.getElementById("progress"),
+          volumeEl = document.getElementById("volume");
+
+    function loadSong(i) {
+      index = (i + tracks.length) % tracks.length;
+      const s = tracks[index];
+      titleEl.textContent = s.title;
+      artistEl.textContent = s.artist;
+      coverEl.src = s.cover;
+      audio.src = s.src;
+      audio.load();
+    }
+
+    function playSong() {
+      audio.play();
+      playBtn.textContent = "⏸ Pause";
+    }
+
+    function pauseSong() {
+      audio.pause();
+      playBtn.textContent = "▶ Play";
+    }
+
+    playBtn.addEventListener("click", () => audio.paused ? playSong() : pauseSong());
+    prevBtn.addEventListener("click", () => { loadSong(index-1); playSong(); });
+    nextBtn.addEventListener("click", () => { loadSong(index+1); playSong(); });
+
+    audio.addEventListener("timeupdate", () => {
+      if (audio.duration) {
+        progress.value = (audio.currentTime / audio.duration) * 100;
+      }
+    });
+    progress.addEventListener("input", () => {
+      audio.currentTime = (progress.value / 100) * audio.duration;
+    });
+    volumeEl.addEventListener("input", () => audio.volume = volumeEl.value);
+
+    loadSong(index);
+  </script>
+</body>
+</html>
